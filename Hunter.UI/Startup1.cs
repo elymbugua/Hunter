@@ -11,7 +11,7 @@ namespace Hunter.UI
     {
         public void Configuration(IAppBuilder app)
         {
-           
+            app.MapSignalR();
         }
     }
 }
