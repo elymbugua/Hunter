@@ -220,7 +220,7 @@
     <Compile Include="Models\LogsProcessor.cs" />
     <Compile Include="Models\RabbitMqManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Startup1.cs" />
+    <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
