@@ -14,5 +14,10 @@ namespace Hunter.UI.Controllers
 
             return View();
         }
+
+        public ActionResult Logs()
+        {
+            return View();
+        }
     }
 }

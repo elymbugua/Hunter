@@ -8,10 +8,10 @@ namespace Hunter.UI.Models
 {
     public class LogsProcessor
     {
-
-        public Task HandleLogPayload(LogPayload logPayload)
-        {
+        public Task ConsumeLogs(LogPayload log)
+        {           
             return null;
         }
+
     }
 }

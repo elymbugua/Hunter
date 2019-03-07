@@ -1,0 +1,42 @@
+﻿
+@{
+    ViewBag.Title = "Realtime Logs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Hunter Log Stream</h2>
+
+<div id="messages" class="container-element">
+
+</div>
+
+
+
+@section scripts{
+    <script type="text/javascript">
+
+        $(function () {
+
+            var connection = $.connection("/realtimelogs");
+            connection.received(function (data) {
+                var logObject = JSON.parse(data);
+                console.log(data);
+
+                var logMessage = '[' + logObject.LoggingDate + '] ' + '[' + logObject.LogCategorization + '] ' + logObject.LogMessage + ' Category: ' +
+                    logObject.Category + ', SubCategory: ' + logObject.Subcategory + ' ApplicationId: ' + logObject.ApplicationId;
+
+                $('#messages').append('<p>' + logMessage + '<p>');
+            })
+
+            connection.start().done(function () {                
+                //$('#sendMessage').on('click', function () {
+                //    connection.send($('#message').val());
+                //})
+                $('#messages').append('<p>Logs Connection established<p>');                
+            });
+        });
+    </script>
+
+}
+
+

@@ -1,4 +1,5 @@
 ﻿using Hunter.UI.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,11 @@ namespace Hunter.UI
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             RabbitMqManager.Start();
+            MongoDbProvider.GetHunterLogsCollection();
+
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.File("hunteruilogs.txt")
+                .CreateLogger();
         }
     }
 }

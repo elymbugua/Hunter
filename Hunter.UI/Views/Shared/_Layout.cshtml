@@ -4,38 +4,81 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+    <link rel="icon" type="image/x-icon" href="~/Content/logs_icon.png"/>
+    <link href="~/Content/datepicker/css/datepicker.css" rel="stylesheet" />
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+
+    <style type="text/css">
+        #messages {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .container-element {
+            width: 800px;
+        }
+
+        #container{
+            width:100%;
+            padding: 0 50px;
+        }
+
+        .text-danger {
+            color: #d9534f;
+        }
+
+        /*.text-info {
+            color: #5bc0de;
+        }*/
+
+        .text-warning {
+            color: #f0ad4e;
+        }
+
+        #messages .filters-container{
+            margin-bottom:10px;
+        }
+
+        p {
+            margin: 0 0 3px;
+            font-size: 13px;
+        }
+    </style>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+        <div class="container" id="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("Hunter", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div class="navbar-collapse collapse">
+            @*<div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
                     <li>@Html.ActionLink("API", "Index", "Help", new { area = "" }, null)</li>
                 </ul>
-            </div>
+            </div>*@
         </div>
     </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
+    <div class="container body-content" id="container">
+        @RenderBody()       
+
+        @*<footer>
             <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
+        </footer>*@
     </div>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <script src="~/Scripts/jquery.signalR-2.3.0.min.js"></script>
+    <script src="~/Scripts/knockout-3.5.0.js"></script>
+    <script src="~/Content/datepicker/js/bootstrap-datepicker.js"></script>
+
     @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Hunter.UI.Models;
 using Microsoft.Owin;
 using Owin;
 
@@ -11,7 +12,7 @@ namespace Hunter.UI
     {
         public void Configuration(IAppBuilder app)
         {
-            app.MapSignalR();
+            app.MapSignalR<SignalRConnection>("/realtimelogs");
         }
     }
 }
