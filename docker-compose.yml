@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  api:
+    image: conference/api
+    container_name: conference_api
+    build:
+      context: .
+    ports:
+      - 5000:80
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      - mongo
+      - mongo-express
+      - postgres
+      - rabbitmq
+
+# Mongo Database
+  mongo:
+    image: mongo:3.6.11
+    container_name: conference_mongo_db
+    ports:
+      - 27018:27017
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+
+# Mongo-Express For The Admin UI
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8082:8081
+
+# RabbitMq
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: conference_queue
+    ports:
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - ./enabled_plugins:/etc/rabbitmq/enabled_plugins
+
+# Postgres
+  postgres:
+    image: postgres:9.6.3
+    container_name: conference_db
+    environment:
+      POSTGRES_DB: conference
+      POSTGRES_USER: conf_app
+      POSTGRES_PASSWORD: docker
+    ports:
+      - 5433:5432
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
