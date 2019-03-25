@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Hunter.UI.Models;
+using Serilog;
 
 namespace hunter.ui
 {
@@ -32,7 +34,7 @@ namespace hunter.ui
             });
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,12 +55,20 @@ namespace hunter.ui
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+           
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            RabbitMqManager.Start();
+            MongoDbProvider.GetHunterLogsCollection();
+            Log.Logger = new LoggerConfiguration()
+              .WriteTo.File("hunteruilogs.txt")
+              .CreateLogger();
         }
     }
 }
