@@ -1,6 +1,4 @@
-﻿using EasyNetQ;
-using EasyNetQ.Topology;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Serilog;
 using Serilog.Core;
 using System;
@@ -12,22 +10,8 @@ using System.Threading.Tasks;
 namespace Hunter.CSharp.Connector
 {
     public class LogAggregatorService
-    {
-        static IAdvancedBus messageBus = null;
-        private readonly static Logger localLogger = null;
-
-        public static IAdvancedBus MessageBus
-        {
-            get
-            {
-                if (messageBus == null)
-                {
-                    messageBus = RabbitMqManager.RabbitMQConnection;
-                }
-
-                return messageBus;
-            }           
-        }
+    {       
+        private readonly static Logger localLogger = null;       
 
         private static LogPayload GetLogPayload(string message,LogConstants logCategory, string appId = null)
         {
@@ -36,7 +20,8 @@ namespace Hunter.CSharp.Connector
                 ApplicationId = appId ?? "",
                 LogCategorization = logCategory,
                 LoggingDate = DateTime.Now,
-                LogMessage = message
+                LogMessage = message,
+                LoggingSource=LogSource.Custom
             };
 
             return logPayload;
@@ -58,20 +43,14 @@ namespace Hunter.CSharp.Connector
             PostLog(GetLogPayload(message, LogConstants.Info, appId));
         }
 
-        public static void PostLog(LogPayload payLoad, string absoulteLogFileName=null)
+        public static void PostLog(LogPayload payLoad,string absoulteLogFileName=null)
         {
             if (payLoad == null)
-                throw new ArgumentNullException("payload cannot be null");
-            
-            string queueName = "applogs";
-            var logsExchenge=MessageBus.ExchangeDeclare("applogs-exchange", ExchangeType.Direct);
-            var logsQueue= MessageBus.QueueDeclare(queueName);
-            MessageBus.Bind(logsExchenge, logsQueue,"A.B");
-            var message = new Message<LogPayload>(payLoad);
+                throw new ArgumentNullException("payload cannot be null");         
 
             try
-            {
-                MessageBus.Publish(Exchange.GetDefault(), queueName, false, message);
+            {               
+                MongoDbProvider.GetHunterLogsCollection().InsertOne(payLoad);
             }
             catch(Exception ex)
             {
@@ -120,6 +99,23 @@ namespace Hunter.CSharp.Connector
                 .CreateLogger();
 
             return logger;
+        }
+
+        public static string GetLogLevel(LogConstants constant)
+        {
+            switch (constant)
+            {
+                case LogConstants.Critical:
+                    return "critical";
+                case LogConstants.Error:
+                    return "error";
+                case LogConstants.Info:
+                    return "info";
+                case LogConstants.Warning:
+                    return "warning";               
+            }
+
+            return "unknown";
         }
     }
 }

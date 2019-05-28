@@ -19,14 +19,13 @@ namespace Hunter.UI
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-            RabbitMqManager.Start();
-            MongoDbProvider.GetHunterLogsCollection();
+            BundleConfig.RegisterBundles(BundleTable.Bundles);       
 
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.File("hunteruilogs.txt")
+                .WriteTo.File(@"C:\Users\Public\Documents\hunteruilogs.txt")
                 .CreateLogger();
+
+            System.Web.Hosting.HostingEnvironment.RegisterObject(new LogsTimer());           
         }
     }
 }

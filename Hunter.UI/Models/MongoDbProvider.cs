@@ -43,10 +43,15 @@ namespace Hunter.UI.Models
             return MongoClient.GetDatabase("hunterlogsdb");
         }
 
-        public static IMongoCollection<LogPayloadEntity> GetHunterLogsCollection()
+        public static IMongoCollection<LogPayload> GetHunterLogsCollection()
         {
 
-            return GetHunterLogsDatabase().GetCollection<LogPayloadEntity>("hunterlogs");
+            return GetHunterLogsDatabase().GetCollection<LogPayload>("hunterlogs");
+        }
+
+        public static IMongoCollection<LatestDateEntity> GetLatestDateCollection()
+        {
+            return GetHunterLogsDatabase().GetCollection<LatestDateEntity>("latestlogstimestamp");
         }
     }
 }

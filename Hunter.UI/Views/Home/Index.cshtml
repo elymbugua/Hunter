@@ -1,58 +1,87 @@
-﻿<div class="well">
+﻿@using Hunter.UI.Models
+@model List<LogPayloadEntity>
+
+<div class="well">
     <h3>Hunter</h3>
     <p> A distributed logging platform </p>
 </div>
 <div class="row">
     <div class="col-md-12" id="messages">
-        <div class="col-md-12 filters-container">
-            <form class="form-inline">
+        <div class="col-md-12 filters-container">        
+
+            <form class="form-inline" onsubmit="return false;">
                 <div class="form-group">
-                    <button class="btn btn-primary"><span class="glyphicon glyphicon-trash"></span></button>
+                    <button class="btn btn-primary" id="clearlogs"><span class="glyphicon glyphicon-trash"></span></button>
                 </div>
 
                 <div class="form-group">
-                    <input type="text" class="form-control filters datepicker" placeholder="Start Date" />
+                    <input type="text" class="form-control filters datepicker" id="startdate" placeholder="Start Date" />
                 </div>
 
                 <div class="form-group">
-                    <input type="text" class="form-control filters datepicker" placeholder="Ending Date" />
+                    <input type="text" class="form-control filters datepicker" id="enddate" placeholder="Ending Date" />
                 </div>
 
                 <div class="form-group">
-                    <input type="text" class="form-control filters" placeholder="Category" />
+                    <input type="text" class="form-control filters" id="category" placeholder="Category" />
                 </div>
 
                 <div class="form-group">
-                    <input type="text" class="form-control filters" placeholder="Sub category" />
+                    <input type="text" class="form-control filters" id="subCategory" placeholder="Sub category" />
                 </div>
 
                 <div class="form-group">
-                    <input type="text" class="form-control filters" placeholder="Pattern" />
+                    <textarea type="text" class="form-control filters" id="pattern" placeholder="Pattern" ></textarea>
                 </div>
 
                 <div class="form-group">
-                    <button class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Search</button>
+                    <button class="btn btn-primary" id="searchlogs"><span class="glyphicon glyphicon-search"></span> Search</button>
                 </div>
 
-            </form>    
-           
+            </form>
+
         </div>
-       <table class="table table-striped" id="logstable">
-           <thead>
-               <tr>
-                   <th>Date</th>
-                   <th>Level</th>
-                   <th>AppId</th>
-                   <th>Category</th>
-                   <th>Sub Category</th>
-                   <th>Message</th>
-               </tr>
-           </thead>
-           <tbody>
-             
-           </tbody>
-       </table>
-    </div>   
+        <table class="table table-striped" id="logstable">
+            <thead>
+                <tr>
+                    <th>AppId</th>
+                    <th>Date</th>
+                    <th>Level</th>
+                    <th>Category</th>
+                    <th>Sub Category</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+               
+
+                @foreach (var logPaylod in Model)
+                {
+                    string logClass = "";
+
+                    if (logPaylod.LogLevel.ToLower().Equals("error"))
+                    {
+                        logClass = "danger";
+                    }
+                    else if (logPaylod.LogLevel.ToLower().Equals("warning"))
+                    {
+                        logClass = "warning";
+                    }
+
+
+                    <tr class="@logClass">
+                        <td>@logPaylod.ApplicationId</td>
+                        <td>@logPaylod.LoggingDate</td>
+                        <td>@logPaylod.LogLevel</td>
+                        <td>@logPaylod.Category</td>
+                        <td>@logPaylod.Subcategory</td>
+                        <td>@logPaylod.LogMessage</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
 </div>
 
 
@@ -62,37 +91,51 @@
         $(function () {
 
             var connection = $.connection("/realtimelogs");
+
             connection.received(function (data) {
                 var logObject = JSON.parse(data);
                 console.log(data);
+
                 var logClass = getLogClass(logObject.LogLevel);
                 var logEntry = '<tr class="' + logClass + '">';
-                logEntry += '<td>'+logObject.LoggingDate + '</p>';
+                logEntry += '<td>' + logObject.ApplicationId + '</p>';
+                logEntry += '<td>' + logObject.LoggingDate + '</td>';
                 logEntry += '<td>' + logObject.LogLevel + '</td>';
-                logEntry += '<td>' + logObject.ApplicationId + '</td>';
                 logEntry += '<td>' + logObject.Category + '</td>';
                 logEntry += '<td>' + logObject.Subcategory + '</td>';
                 logEntry += '<td>' + logObject.LogMessage + '</td>';
-                logEntry += '</tr>';  
-
-
-                //var logMessage = '[' + logObject.LoggingDate + '] ' + '[' + logObject.LogCategorization + '] ' + logObject.LogMessage + ' Category: ' +
-                    //logObject.Category + ', SubCategory: ' + logObject.Subcategory + ' ApplicationId: ' + logObject.ApplicationId;
+                logEntry += '</tr>';           
 
                 $('#logstable tbody').append(logEntry);
             })
 
-            connection.start().done(function () {              
+            connection.start().done(function () {
                 //$('#messages').append('<p>Logs Connection established<p>');
                 console.log('Logs Connection established');
             });
 
-            $('.datepicker').datepicker();
+            $('.datepicker').datepicker({
+                autoclose: true,
+                format: 'dd MM yyyy'
+            });
+
+            $('.datepicker').on('change', function () {
+                console.log($(this));                
+            });
+
+            $('#clearlogs').on('click', function () {
+                clearLogs();
+            });
+
+            $('#searchlogs').on('click', function () {
+                searchLogs();
+            });
+
+            $('#pattern').css({ marginTop: '30px' });
         });
 
         function getLogClass(logLevel) {
             logLevel = logLevel.toLowerCase();
-
 
             if (logLevel == 'error')
                 return 'danger';
@@ -102,10 +145,72 @@
                 return 'warning';
         }
 
-        function LogsViewModel(){
+        function LogsViewModel() {
             var self = this;
 
             this.logs = ko.observableArray([]);
+        }
+
+        function populateLogs(logs) {
+            var logEntries = "";
+            for (var i = 0; i < logs.length; i++) {
+                var log = logs[i];
+
+                var logClass = getLogClass(log.LogLevel);
+                var logEntry = '<tr class="' + logClass + '">';
+                logEntry += '<td>' + log.ApplicationId + '</p>';
+                logEntry += '<td>' + log.LoggingDate + '</td>';
+                logEntry += '<td>' + log.LogLevel + '</td>';
+                logEntry += '<td>' + log.Category + '</td>';
+                logEntry += '<td>' + log.Subcategory + '</td>';
+                logEntry += '<td>' + log.LogMessage + '</td>';
+                logEntry += '</tr>';        
+
+                logEntries += logEntry;
+            }
+
+            $('#logstable tbody').html(logEntries);
+        }
+
+        function clearLogs() {
+            $('#logstable tbody').html("");
+            return false;
+        }
+
+        function searchLogs() {
+            var startDate = $('#startdate').val();
+            var endDate = $('#enddate').val();
+            var category = $('#category').val();
+            var subCategory = $('#subCategory').val();
+            var applicationId = $('#applicationId').val();
+            var pattern = $('#pattern').val();
+
+            var logSearch = {
+                StartDate: startDate,
+                EndDate: endDate,
+                Category: category,
+                SubCategory: subCategory,
+                ApplicationId: applicationId,
+                Pattern: pattern
+            };
+
+            console.log(logSearch);
+
+            $.ajax({
+                type: 'get',
+                url: '/home/searchlogs',
+                dataType: 'json',
+                data:logSearch,
+                success: function (data) {
+                    console.log(data);
+                    populateLogs(data);
+                },
+                error: function (xhr,err) {
+                    console.log(err);
+                }
+            });
+
+            return false;
         }
     </script>
 

@@ -4,10 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
-    <link rel="icon" type="image/x-icon" href="~/Content/logs_icon.png"/>
-    <link href="~/Content/datepicker/css/datepicker.css" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="~/Content/logs_icon.png" />
+    <link href="~/Content/datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" />
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <link href="~/fonts/HelveticaNeue5/style.css" rel="stylesheet" />
 
     <style type="text/css">
         #messages {
@@ -19,8 +20,8 @@
             width: 800px;
         }
 
-        #container{
-            width:100%;
+        #container {
+            width: 100%;
             padding: 0 50px;
         }
 
@@ -36,8 +37,8 @@
             color: #f0ad4e;
         }
 
-        #messages .filters-container{
-            margin-bottom:10px;
+        #messages .filters-container {
+            margin-bottom: 10px;
         }
 
         p {
@@ -77,7 +78,7 @@
     @Scripts.Render("~/bundles/bootstrap")
     <script src="~/Scripts/jquery.signalR-2.3.0.min.js"></script>
     <script src="~/Scripts/knockout-3.5.0.js"></script>
-    <script src="~/Content/datepicker/js/bootstrap-datepicker.js"></script>
+    <script src="~/Content/datepicker/js/bootstrap-datepicker.min.js"></script>
 
     @RenderSection("scripts", required: false)
 </body>
