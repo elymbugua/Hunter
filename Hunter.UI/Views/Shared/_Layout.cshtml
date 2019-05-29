@@ -8,6 +8,7 @@
     <link href="~/Content/datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet" />
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/select2/css/select2.css" rel="stylesheet" />
     <link href="~/fonts/HelveticaNeue5/style.css" rel="stylesheet" />
 
     <style type="text/css">
@@ -59,19 +60,19 @@
                 @Html.ActionLink("Hunter", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             @*<div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("API", "Index", "Help", new { area = "" }, null)</li>
-                </ul>
-            </div>*@
+                    <ul class="nav navbar-nav">
+                        <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
+                        <li>@Html.ActionLink("API", "Index", "Help", new { area = "" }, null)</li>
+                    </ul>
+                </div>*@
         </div>
     </div>
     <div class="container body-content" id="container">
-        @RenderBody()       
+        @RenderBody()
 
         @*<footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>*@
+                <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            </footer>*@
     </div>
 
     @Scripts.Render("~/bundles/jquery")
@@ -79,6 +80,7 @@
     <script src="~/Scripts/jquery.signalR-2.3.0.min.js"></script>
     <script src="~/Scripts/knockout-3.5.0.js"></script>
     <script src="~/Content/datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/Content/select2/select2.min.js"></script>
 
     @RenderSection("scripts", required: false)
 </body>

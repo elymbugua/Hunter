@@ -38,6 +38,10 @@
                     <button class="btn btn-primary" id="searchlogs"><span class="glyphicon glyphicon-search"></span> Search</button>
                 </div>
 
+                <div class="form-group">
+                    <img src="~/Content/spinningdots.gif" width="30" height="30" id="spinner"/>
+                </div>
+
             </form>
 
         </div>
@@ -196,21 +200,35 @@
 
             console.log(logSearch);
 
+            showSpinner();
+
             $.ajax({
                 type: 'get',
-                url: '/home/searchlogs',
+                url: '/api/logs/searchlogs',
                 dataType: 'json',
-                data:logSearch,
+                data: logSearch,
+                //contentType:'application/json',
                 success: function (data) {
                     console.log(data);
                     populateLogs(data);
                 },
                 error: function (xhr,err) {
                     console.log(err);
+                },
+                complete: function () {
+                    hideSpinner();
                 }
             });
 
             return false;
+        }
+
+        function showSpinner() {
+            $('#spinner').show();
+        }
+
+        function hideSpinner() {
+            $('#spinner').hide();
         }
     </script>
 

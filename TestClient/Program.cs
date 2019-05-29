@@ -17,7 +17,7 @@ namespace TestClient
             Console.WriteLine("generating Logs....");         
 
             Settings.ApplicationId = "Test Client";
-            Settings.MongoConnectionString = "192.168.43.41";                   
+            Settings.MongoConnectionString = "192.168.0.116";                   
 
             Log.Logger = new LoggerConfiguration().
                 WriteTo.CSharpConnectorSerilogSink()
