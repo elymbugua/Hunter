@@ -7,8 +7,8 @@ from a single central place.
 The main logging system is implemented using a Microsoft .Net framework MVC/Web Api where logs published are streamed to a browser using
 Asp.net SignalR server push technology.
 
-The connector from the application publishes the logs to a message bus(RabbitMQ). The logging system subscribes to the logging queues and saves the logs and also streams them to the browser if there active connections.
+The connector from the application publishes the logs to mongodb. The UI pulls the logs from mongodb and streams them to the browser if there active connections.
 
-The problem is reduced to developing the connector once the logging system is in place.
+The problem is reduced to developing the connector once the logging system is in place. We currently have a .Net standard and a Java connector in place.
 
 
