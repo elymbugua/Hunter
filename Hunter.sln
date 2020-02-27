@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClient", "TestClient\Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hunter.CSharp.Connector", "Hunter..CSharp.Connector\Hunter.CSharp.Connector.csproj", "{8235B86B-F45E-4523-856B-7A3F90FE5F59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpConnector.NetStandard", "CSharpConnector.NetStandard\CSharpConnector.NetStandard.csproj", "{610829BB-F6AE-4967-A2A8-0DA09E11FB78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hunter.Connector", "CSharpConnector.NetStandard\Hunter.Connector.csproj", "{610829BB-F6AE-4967-A2A8-0DA09E11FB78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

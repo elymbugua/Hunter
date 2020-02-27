@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using Innova.Commons;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Serilog;
@@ -87,28 +88,103 @@ namespace Hunter.UI.Models
             return logs;
         }
 
+        public List<LogPayloadEntity> GetLogs(string applicationId)
+        {            
+            var results = MongoDbProvider.GetHunterLogsCollection().Find(lp=>lp.ApplicationId==applicationId);
+            var logs = new List<LogPayloadEntity>();
+
+            results.ForEachAsync(log =>
+            {
+                logs.Add(GetLogPayloadEntity(log));
+            });
+
+            return logs;
+        }
+
         public List<LogPayloadEntity> FindLogs(DateTime? startDate, DateTime? endingDate, string applicationId)
         {
             var builder = Builders<LogPayload>.Filter;
-            var logs = new List<LogPayloadEntity>();
+            var logs = new List<LogPayloadEntity>();            
+
+            var filterBuilder = new StringBuilder();
 
             if(startDate!=null && endingDate != null && !string.IsNullOrWhiteSpace(applicationId))
             {
-                var date1 = ((DateTime)startDate).Date;
-                var date2= ((DateTime)endingDate).Date;
+                var date1 = DateUtilities.FormatDateToIsoFormat(((DateTime)startDate));
+                var date2 = DateUtilities.FormatDateToIsoFormat(((DateTime)endingDate).AddDays(1));
 
-                var filter = builder.Gte(pl => pl.LoggingDate, date1) & 
-                    builder.Lt(pl => pl.LoggingDate, date2) & builder.Eq(pl=>pl.ApplicationId,applicationId);
-
-                var results = MongoDbProvider.GetHunterLogsCollection().Find(filter);
-                results.ForEachAsync(log =>
-                {
-                    logs.Add(GetLogPayloadEntity(log));
-                });
-                
+                filterBuilder.Append("{ LoggingDate:{$gte:ISODate('").Append(date1).
+                    Append("'), $lte:ISODate('").Append(date2).Append("')}").
+                    Append(",ApplicationId: {$eq:'").Append(applicationId).Append("'} }");                 
             }
+            else if(startDate!=null && endingDate != null)
+            {
+                var date1 = ((DateTime)startDate).Date;
+                var date2 = ((DateTime)endingDate).Date.AddDays(1);               
 
-            return logs;
+                filterBuilder.Append("{ LoggingDate:{$gte:ISODate('").
+                    Append(DateUtilities.FormatDateToIsoFormat(date1)).
+                   Append("'), $lte:ISODate('").Append(DateUtilities.FormatDateToIsoFormat(date2)).Append("')} }");
+            }
+            else if(startDate!=null && !string.IsNullOrWhiteSpace(applicationId))
+            {
+                var date1 = ((DateTime)startDate).Date;
+                var date2 = date1.AddDays(1);               
+
+                filterBuilder.Append("{ LoggingDate:{$gte:ISODate('").
+                    Append(DateUtilities.FormatDateToIsoFormat(date1)).
+                   Append("'), $lte:ISODate('").Append(DateUtilities.FormatDateToIsoFormat(date2)).Append("')}").
+                   Append(",ApplicationId: {$eq:'").Append(applicationId).Append("'} }");
+            }
+            else if(endingDate!=null && !string.IsNullOrWhiteSpace(applicationId))
+            {
+                var date1 = ((DateTime)endingDate).Date;
+                var date2 = date1.AddDays(1);
+
+                filterBuilder.Append("{ LoggingDate:{$gte:ISODate('").
+                   Append(DateUtilities.FormatDateToIsoFormat(date1)).
+                   Append("'), $lte:ISODate('").Append(DateUtilities.FormatDateToIsoFormat(date2)).Append("')}").
+                   Append(",ApplicationId: {$eq:'").Append(applicationId).Append("'} }");                
+            }
+            else if (startDate != null)
+            {
+                var date1 = ((DateTime)startDate).Date;
+                var date2 = date1.AddDays(1);
+
+                filterBuilder.Append("{ LoggingDate:{$gte:ISODate('").
+                    Append(DateUtilities.FormatDateToIsoFormat(date1)).
+                 Append("'), $lte:ISODate('").
+                 Append(DateUtilities.FormatDateToIsoFormat(date2)).Append("')} }");              
+            }
+            else if (endingDate != null)
+            {
+                var date1 = ((DateTime)endingDate).Date;
+                var date2 = date1.AddDays(1);
+
+                string d1 = DateUtilities.FormatDateToIsoFormat(date1),
+                    d2 = DateUtilities.FormatDateToIsoFormat(date2);
+
+                filterBuilder.Append("{ LoggingDate:{$gte:ISODate('").Append(d1).
+                Append("'), $lte:ISODate('").Append(d2).Append("')} }");                
+            }
+            else if (!string.IsNullOrWhiteSpace(applicationId))
+            {                              
+                 filterBuilder.Append("{ApplicationId: {$eq:'").Append(applicationId).Append("'}}");
+            }
+            else
+            {
+                return logs;
+            }           
+
+            var results = MongoDbProvider.GetHunterLogsCollection().
+                        Find(filterBuilder.ToString()).ToList();
+
+            results.ForEach(log =>
+            {
+                logs.Add(GetLogPayloadEntity(log));
+            });
+
+            return logs.OrderBy(log=>log.LoggingDate).ToList();
         }
 
         public List<LogPayloadEntity> FilterLogs(string json)
@@ -125,7 +201,7 @@ namespace Hunter.UI.Models
         }
 
         public string ConstructQueryFilters(DateTime? startDate,DateTime? endingDate,
-            string category,string subcategory,LogConstants logLevel,string pattern)
+           string applicationId)
         {
             var filterBuilder = new StringBuilder();
             if(startDate!=null && endingDate != null)
@@ -150,17 +226,7 @@ namespace Hunter.UI.Models
 
                 filterBuilder.Append("{ LoggingDate:{$gte:ISODate('").Append(date1).
                     Append("'), $lte:ISODate('").Append(date2).Append("')}");
-            }
-
-            if (!string.IsNullOrWhiteSpace(category))
-            {
-                filterBuilder.Append(", Category:{$eq:'").Append(category).Append("'}");
-            }
-
-            if (!string.IsNullOrWhiteSpace(subcategory))
-            {
-                filterBuilder.Append(", SubCategory:{$eq:'").Append(subcategory).Append("'}");
-            }
+            }          
 
             return filterBuilder.Append("}").ToString();
         }
@@ -176,7 +242,7 @@ namespace Hunter.UI.Models
                 logEntities.Add(GetLogPayloadEntity(pl));
             });
 
-            return logEntities;
+            return logEntities.OrderBy(le=>le.LoggingDate).ToList();
         }
 
         public LogPayloadEntity GetLogPayloadEntity(LogPayload logPayload)
@@ -189,13 +255,16 @@ namespace Hunter.UI.Models
                 logPayload = JsonConvert.DeserializeObject<LogPayload>(logPayload.LogMessage);
             }
 
-            logPayload.LoggingDate= logPayload.LoggingDate.ToLocalTime();
+            if(logPayload.Runtime!=null && logPayload.Runtime.ToLower().Equals(".net"))
+            {
+                logPayload.LoggingDate = logPayload.LoggingDate.ToLocalTime();
+            }
 
             return new LogPayloadEntity
             {
                 ApplicationId = logPayload.ApplicationId,
-                Category = logPayload.Category,
-                Subcategory = logPayload.Subcategory,
+                Category = logPayload.Category == null ? string.Empty : logPayload.Category,
+                Subcategory = logPayload.Subcategory == null ? string.Empty : logPayload.Subcategory,
                 LoggingDate = logPayload.LoggingDate.ToString("dd-MM-yyyy hh:mm:ss tt"),
                 LogLevel = GetLogLevel(logPayload.LogCategorization).ToUpper(),
                 LogMessage = logPayload.LogMessage,
@@ -241,14 +310,14 @@ namespace Hunter.UI.Models
                         LatestDate= DateTime.Now
                     });
 
-                    logsMatched = MongoDbProvider.GetHunterLogsCollection().Find(new BsonDocument()).ToList();
+                    logsMatched = MongoDbProvider.GetHunterLogsCollection().Find(new BsonDocument()).Limit(100).ToList();
                 }
                 else
                 {
                     var filter = new FilterDefinitionBuilder<LogPayload>().Gt(payload => payload.LoggingDate,
                         latestLogsTimeStamp.LatestDate);
 
-                    logsMatched = MongoDbProvider.GetHunterLogsCollection().Find(filter).ToList();
+                    logsMatched = MongoDbProvider.GetHunterLogsCollection().Find(filter).Limit(100).ToList();
 
                     latestLogsTimeStamp.LatestDate = DateTime.Now;
 

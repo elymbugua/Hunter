@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.5</TargetFrameworks>
+    <AssemblyName>Hunter.Connector</AssemblyName>
+    <RootNamespace>Hunter.Connector</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Elijah Mbugua</Authors>
+    <Company>Elijah Mbugua</Company>
+    <Description>Publishes logs from an application instance in a standard way to a mongo db instance where they are consumed by the hunter ui. Its part of the hunter distributed logging platform.</Description>
+    <Copyright>Copyright 2019</Copyright>
+    <Version>1.2.0</Version>
+    <PackageProjectUrl>https://github.com/mbugua2015/Hunter</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mbugua2015/Hunter</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="RabbitMqManager.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Serilog" Version="2.8.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>

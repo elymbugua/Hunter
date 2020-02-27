@@ -34,7 +34,8 @@ namespace Hunter.UI.Models
         public string IpAddress { get; set; }
         public string CpuUtilization { get; set; }
         public string MemoryUtilization { get; set; }
-        public IDictionary<object, object> Options { get; set; } = new Dictionary<object, object>();
-        public object Exception { get; set; }
+        public IDictionary<object, object> Options { get; set; } = new Dictionary<object, object>();       
+        public string Runtime { get; set; }
+        public Exception Exception { get; set; }
     }
 }

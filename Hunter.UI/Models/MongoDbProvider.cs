@@ -18,14 +18,15 @@ namespace Hunter.UI.Models
                 if (mongoClient != null)
                     return mongoClient;
 
-                var mongoConnectionString = ConfigurationManager.AppSettings["MongoConnectionString"];
+                var mongoConnectionString = ConfigurationManager.AppSettings["MongoConnectionString"];                
 
                 var serverUrls = mongoConnectionString.Split(';');
                 List<MongoServerAddress> nodes = new List<MongoServerAddress>();
 
                 foreach(var url in serverUrls)
                 {
-                    nodes.Add(new MongoServerAddress(url));
+                    var urlParts = url.Split(':');
+                    nodes.Add(new MongoServerAddress(urlParts[0],int.Parse(urlParts[1])));
                 }
 
                 mongoClient = new MongoClient(new MongoClientSettings

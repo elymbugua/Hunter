@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hunter.CSharp.Connector
+namespace Hunter.Connector
 {
     public static class SinkExtensions
     {

@@ -3,29 +3,28 @@ using Serilog.Core;
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hunter.CSharp.Connector
+namespace Hunter.Connector
 {
     public class CSharpConnectorSerilogSink : ILogEventSink
     {
-        private readonly IFormatProvider _formatProvider;       
-        
+        private readonly IFormatProvider _formatProvider;
+
         public CSharpConnectorSerilogSink(IFormatProvider formatProvider)
         {
-            _formatProvider = formatProvider;           
+            _formatProvider = formatProvider;
         }
 
         public void Emit(LogEvent logEvent)
-        {      
+        {
             var options = new Dictionary<object, object>();
 
             if (logEvent.Properties != null)
             {
-                foreach(var keyVAluePair in logEvent.Properties)
+                foreach (var keyVAluePair in logEvent.Properties)
                 {
                     options.Add(JsonConvert.SerializeObject(keyVAluePair.Key),
                         JsonConvert.SerializeObject(keyVAluePair.Value));
@@ -33,18 +32,23 @@ namespace Hunter.CSharp.Connector
             }
 
             string message = logEvent.RenderMessage(_formatProvider);
-            
+
             var logPayload = new LogPayload
             {
-                ApplicationId=Settings.ApplicationId,
-                LogCategorization= GetHunterLogLevel(logEvent.Level),               
-                LogMessage= message,
-                LoggingDate= DateTime.Now,
-                Options=options,
-                Exception=logEvent.Exception
+                ApplicationId = Settings.ApplicationId,
+                LogCategorization = GetHunterLogLevel(logEvent.Level),
+                LogMessage = message,
+                LoggingDate = DateTime.Now,
+                Options = options,
+                Exception = logEvent.Exception,
+                LoggingSource = LogSource.AppLogger,
+                Runtime=".Net"
             };
 
-            LogAggregatorService.PostLog(logPayload,null);
+            //var logJson = JsonConvert.SerializeObject(logPayload);
+            //logPayload.LogMessage = logJson;
+
+            LogAggregatorService.PostLog(logPayload, null);
         }
 
         private LogConstants GetHunterLogLevel(LogEventLevel logEventLevel)

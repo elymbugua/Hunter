@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>D:\Projects\HunterLogProvider\Hunter\CSharpConnector.NetStandard\Hunter.Connector.csproj</id>
+    <version>1.2.0</version>
+    <authors>Elijah Mbugua</authors>
+    <owners>Elijah Mbugua</owners>    
+    <projectUrl>https://github.com/mbugua2015/Hunter</projectUrl>  
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Publishes logs from an application instance in a standard way to a mongo db instance where they are consumed by the hunter ui. Its part of the hunter distributed logging platform.</description>
+    <releaseNotes>Bug Fixes</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>CentralizedLogging Microservices</tags>
+    <dependencies>     
+    </dependencies>
+  </metadata>
+</package>

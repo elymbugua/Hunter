@@ -35,5 +35,6 @@ namespace Hunter.CSharp.Connector
         public string MemoryUtilization { get; set; }        
         public IDictionary<object, object> Options { get; set; } = new Dictionary<object, object>();
         public object Exception { get; set; }
+        public string Runtime { get; set; }
     }
 }

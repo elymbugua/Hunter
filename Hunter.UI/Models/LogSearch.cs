@@ -13,6 +13,6 @@ namespace Hunter.UI.Models
         public string Subcategory { get; set; }
         public string ApplicationId { get; set; }
         public string LogLevel { get; set; }
-        public string Pattern { get; set; }
+        //public string Pattern { get; set; }
     }
 }

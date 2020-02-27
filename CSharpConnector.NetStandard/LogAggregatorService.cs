@@ -7,31 +7,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hunter.CSharp.Connector
+namespace Hunter.Connector
 {
     public class LogAggregatorService
-    {       
-        private readonly static Logger localLogger = null;       
+    {
+        private readonly static Logger localLogger = null;
 
-        private static LogPayload GetLogPayload(string message,LogConstants logCategory, string appId = null)
+        private static LogPayload GetLogPayload(string message, LogConstants logCategory, string appId = null)
         {
             var logPayload = new LogPayload
             {
                 ApplicationId = appId ?? "",
                 LogCategorization = logCategory,
                 LoggingDate = DateTime.Now,
-                LogMessage = message
+                LogMessage = message,
+                LoggingSource = LogSource.Custom,
+                Runtime=".Net"
             };
 
             return logPayload;
         }
 
-        public static void PostError(string message, string appId=null)
+        public static void PostError(string message, string appId = null)
         {
             if (message == null)
-                throw new ArgumentException("Log message cannot be null");
+                throw new ArgumentException("Log message cannot be null");            
 
-            PostLog(GetLogPayload(message,LogConstants.Error, appId));
+            PostLog(GetLogPayload(message, LogConstants.Error, appId));
         }
 
         public static void PostInfo(string message, string appId = null)
@@ -42,27 +44,29 @@ namespace Hunter.CSharp.Connector
             PostLog(GetLogPayload(message, LogConstants.Info, appId));
         }
 
-        public static void PostLog(LogPayload payLoad,string absoulteLogFileName=null)
+        public static void PostLog(LogPayload payLoad, string absoulteLogFileName = null)
         {
             if (payLoad == null)
-                throw new ArgumentNullException("payload cannot be null");         
+                throw new ArgumentNullException("payload cannot be null");
 
             try
-            {               
+            {                
                 MongoDbProvider.GetHunterLogsCollection().InsertOne(payLoad);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                var localLogger = GetLocalLogger(absoulteLogFileName);
-                localLogger.Error(ex.ToString());
-
+                Log.Error(ex, "An error occured publishing log");
                 if (absoulteLogFileName != null)
-                    LogLocally(payLoad,localLogger);
+                {
+                    var localLogger = GetLocalLogger(absoulteLogFileName);
+                    localLogger.Error(ex.ToString());
+                    LogLocally(payLoad, localLogger);
+                }                   
             }
-            
+
         }
 
-        private static void LogLocally(LogPayload logPayload,Logger logger)
+        private static void LogLocally(LogPayload logPayload, Logger logger)
         {
             switch (logPayload.LogCategorization)
             {
@@ -78,14 +82,14 @@ namespace Hunter.CSharp.Connector
                 case LogConstants.Warning:
                     logger.Warning("{[AppId]} {Date} {Log}", logPayload.ApplicationId, logPayload.LoggingDate, logPayload.LogMessage);
                     break;
-            }                
-        }       
+            }
+        }
 
         public static void SetupUnhandledExceptionsHandler()
         {
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.CSharpConnectorSerilogSink()
-                .CreateLogger();                
+                .CreateLogger();
         }
 
         public static Logger GetLocalLogger(string absoluteLogFileName)
@@ -111,7 +115,7 @@ namespace Hunter.CSharp.Connector
                 case LogConstants.Info:
                     return "info";
                 case LogConstants.Warning:
-                    return "warning";               
+                    return "warning";
             }
 
             return "unknown";
