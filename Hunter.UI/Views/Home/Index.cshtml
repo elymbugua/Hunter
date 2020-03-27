@@ -136,16 +136,10 @@
 
         $(function () {
 
-            var connection = $.connection("/realtimelogs");
-
-            var logsCount = 0;
+            var connection = $.connection("/realtimelogs"); 
 
             connection.received(function (data) {
-                var logObject = JSON.parse(data);
-                console.log(data);
-
-                if (logsCount > 1000)
-                    $('#logstable tbody').html('');
+                var logObject = JSON.parse(data);             
 
                 var logClass = getLogClass(logObject.LogLevel);
                 var logEntry = '<tr class="' + logClass + '">';
@@ -158,11 +152,11 @@
                 logEntry += '</tr>';           
 
                 $('#logstable tbody').append(logEntry);
-                logsCount++;
+
+                
             })
 
-            connection.start().done(function () {
-                //$('#messages').append('<p>Logs Connection established<p>');
+            connection.start().done(function () {                
                 console.log('Logs Connection established');
             });
 

@@ -22,7 +22,7 @@ namespace Hunter.UI
             BundleConfig.RegisterBundles(BundleTable.Bundles);       
 
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.File(@"C:\Users\Public\Documents\hunteruilogs.txt")
+                .WriteTo.File(@"C:\Users\Public\Documents\hunteruilogs.log")
                 .CreateLogger();
 
             System.Web.Hosting.HostingEnvironment.RegisterObject(new LogsTimer());           

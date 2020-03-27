@@ -43,10 +43,7 @@ namespace Hunter.Connector
                 Exception = logEvent.Exception,
                 LoggingSource = LogSource.AppLogger,
                 Runtime=".Net"
-            };
-
-            //var logJson = JsonConvert.SerializeObject(logPayload);
-            //logPayload.LogMessage = logJson;
+            };           
 
             LogAggregatorService.PostLog(logPayload, null);
         }

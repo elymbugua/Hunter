@@ -20,6 +20,11 @@ namespace Hunter.UI
             var subCategoryIndex = Builders<LogPayload>.IndexKeys.Ascending(pl => pl.Subcategory);
             var logCategorizationIndex = Builders<LogPayload>.IndexKeys.Ascending(pl => pl.LogCategorization);
 
+            //Compound Index for searching logs with logging date and application id
+            MongoDbProvider.GetHunterLogsCollection().Indexes.CreateOne(
+                Builders<LogPayload>.IndexKeys.Ascending(c => c.LoggingDate).Ascending(c => c.ApplicationId),
+                new CreateIndexOptions { Sparse = true });
+
             MongoDbProvider.GetHunterLogsCollection().Indexes.CreateOne(dateIndex);
             MongoDbProvider.GetHunterLogsCollection().Indexes.CreateOne(appIndex);
             MongoDbProvider.GetHunterLogsCollection().Indexes.CreateOne(categoryIndex);

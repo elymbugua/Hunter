@@ -250,31 +250,51 @@ namespace Hunter.UI.Models
             if (logPayload == null)
                 throw new ArgumentNullException("logPayLoad cannot be null");
 
-            if (logPayload.LoggingSource == LogSource.AppLogger)
+            try
+            {              
+
+                if (logPayload.LoggingSource == LogSource.AppLogger)
+                {
+                    try
+                    {
+                        logPayload = JsonConvert.DeserializeObject<LogPayload>(logPayload.LogMessage);
+                    }
+                    catch(Exception ex)
+                    {
+                        Log.Information($"{JsonConvert.SerializeObject(logPayload)} does not need logmeassage extraction");
+                    }
+                   
+                }
+
+                if (logPayload.Runtime != null && logPayload.Runtime.ToLower().Equals(".net"))
+                {
+                    logPayload.LoggingDate = logPayload.LoggingDate.ToLocalTime();
+                }
+
+                return new LogPayloadEntity
+                {
+                    ApplicationId = logPayload.ApplicationId,
+                    Category = logPayload.Category == null ? string.Empty : logPayload.Category,
+                    Subcategory = logPayload.Subcategory == null ? string.Empty : logPayload.Subcategory,
+                    LoggingDate = logPayload.LoggingDate.ToString("dd-MM-yyyy hh:mm:ss tt"),
+                    LogLevel = GetLogLevel(logPayload.LogCategorization).ToUpper(),
+                    LogMessage = logPayload.LogMessage,
+                    CpuUtilization = logPayload.CpuUtilization == null ? string.Empty : logPayload.CpuUtilization,
+                    Exception = logPayload.Exception == null ? string.Empty : logPayload.Exception.ToString(),
+                    IpAddress = logPayload.IpAddress == null ? string.Empty : logPayload.IpAddress,
+                    MemoryUtilization = logPayload.MemoryUtilization == null ? string.Empty : logPayload.MemoryUtilization,
+                    Options = logPayload.Options,
+                    OS = logPayload.OS == null ? string.Empty : logPayload.OS
+                };
+            }
+            catch(Exception ex)
             {
-                logPayload = JsonConvert.DeserializeObject<LogPayload>(logPayload.LogMessage);
+                Log.Information(JsonConvert.SerializeObject(logPayload));
+                Log.Error(ex, "An error occured deserializing");
+                throw new InvalidOperationException("An error occured deserializing");
             }
 
-            if(logPayload.Runtime!=null && logPayload.Runtime.ToLower().Equals(".net"))
-            {
-                logPayload.LoggingDate = logPayload.LoggingDate.ToLocalTime();
-            }
-
-            return new LogPayloadEntity
-            {
-                ApplicationId = logPayload.ApplicationId,
-                Category = logPayload.Category == null ? string.Empty : logPayload.Category,
-                Subcategory = logPayload.Subcategory == null ? string.Empty : logPayload.Subcategory,
-                LoggingDate = logPayload.LoggingDate.ToString("dd-MM-yyyy hh:mm:ss tt"),
-                LogLevel = GetLogLevel(logPayload.LogCategorization).ToUpper(),
-                LogMessage = logPayload.LogMessage,
-                CpuUtilization = logPayload.CpuUtilization == null ? string.Empty : logPayload.CpuUtilization,
-                Exception = logPayload.Exception == null ? string.Empty : logPayload.Exception.ToString(),
-                IpAddress = logPayload.IpAddress == null ? string.Empty : logPayload.IpAddress,
-                MemoryUtilization =logPayload.MemoryUtilization==null?string.Empty:logPayload.MemoryUtilization,
-                Options=logPayload.Options,
-                OS=logPayload.OS==null?string.Empty:logPayload.OS
-            };
+         
         }
 
         private string GetLogLevel(LogConstants logLevel)
