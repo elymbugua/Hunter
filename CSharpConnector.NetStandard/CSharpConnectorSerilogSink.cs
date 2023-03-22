@@ -35,7 +35,7 @@ namespace Hunter.Connector
 
             var logPayload = new LogPayload
             {
-                ApplicationId = Settings.ApplicationId,
+                ApplicationId = HunterSettings.ApplicationId,
                 LogCategorization = GetHunterLogLevel(logEvent.Level),
                 LogMessage = message,
                 LoggingDate = DateTime.Now,

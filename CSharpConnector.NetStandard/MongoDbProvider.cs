@@ -17,7 +17,7 @@ namespace Hunter.Connector
                 if (mongoClient != null)
                     return mongoClient;
 
-                var mongoConnectionString = Settings.MongoConnectionString;
+                var mongoConnectionString = HunterSettings.MongoConnectionString;
 
                 var serverUrls = mongoConnectionString.Split(';');
 

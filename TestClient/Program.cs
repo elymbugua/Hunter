@@ -18,8 +18,8 @@ namespace TestClient
         {
             Console.WriteLine("generating Logs....");         
 
-            Settings.ApplicationId = "Test Client";
-            Settings.MongoConnectionString = "localhost";         
+            HunterSettings.ApplicationId = "Test Client";
+            HunterSettings.MongoConnectionString = "localhost";         
 
             Log.Logger = new LoggerConfiguration().
                 WriteTo.CSharpConnectorSerilogSink()

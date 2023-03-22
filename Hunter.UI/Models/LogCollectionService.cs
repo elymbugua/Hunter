@@ -177,7 +177,7 @@ namespace Hunter.UI.Models
             }           
 
             var results = MongoDbProvider.GetHunterLogsCollection().
-                        Find(filterBuilder.ToString()).ToList();
+                        Find(filterBuilder.ToString()).SortBy(l=>l.LoggingDate).ToList();
 
             results.ForEach(log =>
             {
@@ -235,14 +235,14 @@ namespace Hunter.UI.Models
         {
             var logEntities = new List<LogPayloadEntity>();
             var matchingLogs = MongoDbProvider.GetHunterLogsCollection().Find(new BsonDocument())
-                .Limit(100).SortByDescending(pl => pl.LoggingDate).ToList();
+                .Limit(100).SortBy(pl => pl.LoggingDate).ToList();
 
             matchingLogs.ForEach(pl =>
             {
                 logEntities.Add(GetLogPayloadEntity(pl));
             });
 
-            return logEntities.OrderBy(le=>le.LoggingDate).ToList();
+            return logEntities.ToList();
         }
 
         public LogPayloadEntity GetLogPayloadEntity(LogPayload logPayload)
@@ -292,9 +292,7 @@ namespace Hunter.UI.Models
                 Log.Information(JsonConvert.SerializeObject(logPayload));
                 Log.Error(ex, "An error occured deserializing");
                 throw new InvalidOperationException("An error occured deserializing");
-            }
-
-         
+            }         
         }
 
         private string GetLogLevel(LogConstants logLevel)
@@ -330,14 +328,14 @@ namespace Hunter.UI.Models
                         LatestDate= DateTime.Now
                     });
 
-                    logsMatched = MongoDbProvider.GetHunterLogsCollection().Find(new BsonDocument()).Limit(100).ToList();
+                    logsMatched = MongoDbProvider.GetHunterLogsCollection().Find(new BsonDocument()).SortBy(l=>l.LoggingDate).Limit(100).ToList();
                 }
                 else
                 {
                     var filter = new FilterDefinitionBuilder<LogPayload>().Gt(payload => payload.LoggingDate,
                         latestLogsTimeStamp.LatestDate);
 
-                    logsMatched = MongoDbProvider.GetHunterLogsCollection().Find(filter).Limit(100).ToList();
+                    logsMatched = MongoDbProvider.GetHunterLogsCollection().Find(filter).SortBy(l=>l.LoggingDate).Limit(100).ToList();
 
                     latestLogsTimeStamp.LatestDate = DateTime.Now;
 
