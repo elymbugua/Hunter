@@ -7,7 +7,7 @@ from a single central place.
 The main logging system is implemented using Asp.Net Core where logs published are streamed to a browser using
 Asp.net SignalR server push technology.
 
-The connector from the application publishes the logs to mongodb. The UI pulls the logs from an api that connects to mongodb and streams them to the browser if there active connections.
+The connector from the application publishes the logs to mongodb. The UI pulls the logs from an api that connects to mongodb and streams them to the browser if there are active connections.
 
 The problem is reduced to developing the connector once the logging system is in place. We currently have a .Net standard and a Java connector in place.
 
